@@ -220,3 +220,30 @@ local node_name_ta2, node_name_ta3, node_name_ta4 =
 		tube_sides = {L=1, R=1, U=1},
 	}, nil, "ta_apiary:ta")
 
+minetest.register_craft({
+	output = node_name_ta2,
+	recipe = {
+		{"group:wood",    "techage:ta3_pipeS",  "group:wood"},
+		{"techage:tubeS", "techage:ta3_silo",   "techage:tubeS"},
+		{"group:wood",    "techage:iron_ingot", "group:wood"},
+	},
+})
+
+minetest.register_craft({
+	output = node_name_ta3,
+	recipe = {
+		{"",                               "basic_materials:motor", ""},
+		{"basic_materials:heating_element", node_name_ta2,          "basic_materials:heating_element"},
+		{"",                               "techage:vacuum_tube",   ""},
+	},
+})
+
+minetest.register_craft({
+	output = node_name_ta4,
+	recipe = {
+		{"",                "techage:ta4_carbon_fiber", ""},
+		{"techage:ta4_leds", node_name_ta3,             "techage:ta4_leds"},
+		{"",                "techage:ta4_wlanchip",     ""},
+	},
+})
+
