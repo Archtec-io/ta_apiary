@@ -17,9 +17,6 @@
 local M = minetest.get_meta
 local S = ta_apiary.S
 
--- Consumer Related Data
-local CRD = function(pos) return (minetest.registered_nodes[techage.get_node_lvm(pos).name] or {}).consumer or {} end
-
 local STANDBY_TICKS = 3
 local COUNTDOWN_TICKS = 4
 local CYCLE_TIME = 4
@@ -47,73 +44,30 @@ local function formspec(self, pos, nvm)
 	default.get_hotbar_bg(0, 4)
 end
 
-local function allow_metadata_inventory_put(pos, listname, index, stack, player)
-	if minetest.is_protected(pos, player:get_player_name()) then
-		return 0
-	end
-	if listname == "src" then
-		local state = CRD(pos).State
-		if state then
-			state:start_if_standby(pos)
-		end
-	end
-	return stack:get_count()
-end
-
-local function allow_metadata_inventory_move(pos, from_list, from_index, to_list, to_index, count, player)
-	local inv = M(pos):get_inventory()
-	local stack = inv:get_stack(from_list, from_index)
-	return allow_metadata_inventory_put(pos, to_list, to_index, stack, player)
-end
-
-local function allow_metadata_inventory_take(pos, listname, index, stack, player)
-	if minetest.is_protected(pos, player:get_player_name()) then
-		return 0
-	end
-	return stack:get_count()
-end
-
-local function count_items(inv, list_name, item_name, max_count)
-	local item_stack = ItemStack(item_name)
-	item_stack:set_count(max_count)
-	while item_stack:get_count() > 0 do
-		if inv:contains_item(list_name, item_stack) then
-			return item_stack:get_count()
-		else
-			item_stack:set_count(item_stack:get_count() - 1)
-		end
-	end
-	return 0
-end
 
 local function extracting(pos, crd, nvm, inv)
-	local item_count = count_items(inv, "src", "bees:frame_full", crd.num_items)
-	item_count = count_items(inv, "src", "vessels:glass_bottle", item_count)
+	local item_count = ta_apiary.count_items(inv, "src", "bees:frame_full", crd.num_items)
+	item_count = ta_apiary.count_items(inv, "src", "vessels:glass_bottle", item_count)
 
 	if item_count == 0 then
 		crd.State:idle(pos, nvm)
 		return
 	end
 
-	local honey_stack = ItemStack("bees:bottle_honey")
-	honey_stack:set_count(item_count)
+	local honey_stack = ItemStack({name = "bees:bottle_honey", count = item_count})
 
-	local wax_stack = ItemStack("bees:wax")
-	wax_stack:set_count(item_count)
+	local wax_stack = ItemStack({name = "bees:wax", count = item_count})
 
-	local empty_frames_stack = ItemStack("bees:frame_empty")
-	empty_frames_stack:set_count(item_count)
+	local empty_frames_stack = ItemStack({name = "bees:frame_empty", count = item_count})
 
 	if inv:room_for_item("dst", honey_stack)
 		and inv:room_for_item("dst", wax_stack)
 		and inv:room_for_item("dst", frames_stack) then
 
-		local full_frames_stack = ItemStack("bees:frame_full")
-		full_frames_stack:set_count(item_count)
+		local full_frames_stack = ItemStack({name = "bees:frame_full", count = item_count})
 		inv:remove_item("src", full_frames_stack)
 
-		local bottles_stack = ItemStack("vessels:glass_bottle")
-		bottles_stack:set_count(item_count)
+		local bottles_stack = ItemStack({name = "vessels:glass_bottle", count = item_count})
 		inv:remove_item("src", bottles_stack)
 
 		inv:add_item("dst", honey_stack)
@@ -128,27 +82,10 @@ end
 
 local function keep_running(pos, elapsed)
 	local nvm = techage.get_nvm(pos)
-	local crd = CRD(pos)
+	local crd = ta_apiary.CRD(pos)
 	local inv = M(pos):get_inventory()
 	extracting(pos, crd, nvm, inv)
 end
-
-local function on_receive_fields(pos, formname, fields, player)
-	if minetest.is_protected(pos, player:get_player_name()) then
-		return
-	end
-	local nvm = techage.get_nvm(pos)
-	CRD(pos).State:state_button_event(pos, nvm, fields)
-end
-
-local function can_dig(pos, player)
-	if minetest.is_protected(pos, player:get_player_name()) then
-		return false
-	end
-	local inv = M(pos):get_inventory()
-	return inv:is_empty("dst") and inv:is_empty("src")
-end
-
 
 local tiles = {}
 -- '#' will be replaced by the stage number
@@ -172,42 +109,6 @@ tiles.act = {
 	"techage_filling_ta#.png^ta_apiary_extractor_front_active.png^techage_frame_ta#.png",
 }
 
-local tubing = {
-	on_pull_item = function(pos, in_dir, num)
-		local meta = minetest.get_meta(pos)
-		if meta:get_int("pull_dir") == in_dir then
-			local inv = M(pos):get_inventory()
-			return techage.get_items(pos, inv, "dst", num)
-		end
-	end,
-	on_push_item = function(pos, in_dir, stack)
-		local meta = minetest.get_meta(pos)
-		if meta:get_int("push_dir") == in_dir or in_dir == 5 then
-			local inv = M(pos):get_inventory()
-			--CRD(pos).State:start_if_standby(pos) -- would need power!
-			return techage.put_items(inv, "src", stack)
-		end
-	end,
-	on_unpull_item = function(pos, in_dir, stack)
-		local meta = minetest.get_meta(pos)
-		if meta:get_int("pull_dir") == in_dir then
-			local inv = M(pos):get_inventory()
-			return techage.put_items(inv, "dst", stack)
-		end
-	end,
-	on_recv_message = function(pos, src, topic, payload)
-		return CRD(pos).State:on_receive_message(pos, topic, payload)
-	end,
-	on_beduino_receive_cmnd = function(pos, src, topic, payload)
-		return CRD(pos).State:on_beduino_receive_cmnd(pos, topic, payload)
-	end,
-	on_beduino_request_data = function(pos, src, topic, payload)
-		return CRD(pos).State:on_beduino_request_data(pos, topic, payload)
-	end,
-	on_node_load = function(pos)
-		CRD(pos).State:on_node_load(pos)
-	end,
-}
 
 local node_name_ta2, node_name_ta3, node_name_ta4 =
 	techage.register_consumer("honey_extractor", S("Honey Extractor"), tiles, {
@@ -230,18 +131,18 @@ local node_name_ta2, node_name_ta3, node_name_ta4 =
 		cycle_time = CYCLE_TIME,
 		standby_ticks = STANDBY_TICKS,
 		formspec = formspec,
-		tubing = tubing,
+		tubing = ta_apiary.tubing,
 		after_place_node = function(pos, placer)
 			local inv = M(pos):get_inventory()
 			inv:set_size('src', 9)
 			inv:set_size('dst', 9)
 		end,
-		can_dig = can_dig,
+		can_dig = ta_apiary.can_dig,
 		node_timer = keep_running,
-		on_receive_fields = on_receive_fields,
-		allow_metadata_inventory_put = allow_metadata_inventory_put,
-		allow_metadata_inventory_move = allow_metadata_inventory_move,
-		allow_metadata_inventory_take = allow_metadata_inventory_take,
+		on_receive_fields = ta_apiary.on_receive_fields,
+		allow_metadata_inventory_put = ta_apiary.allow_metadata_inventory_put,
+		allow_metadata_inventory_move = ta_apiary.allow_metadata_inventory_move,
+		allow_metadata_inventory_take = ta_apiary.allow_metadata_inventory_take,
 		groups = {choppy=2, cracky=2, crumbly=2},
 		sounds = default.node_sound_wood_defaults(),
 		num_items = {0,1,2,4},

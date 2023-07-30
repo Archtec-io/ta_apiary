@@ -14,6 +14,32 @@
 
 local S = ta_apiary.bees_S
 
+local function hive_artificial(pos)
+	local spos = pos.x..","..pos.y..","..pos.z
+	local formspec = "size[8,9]"
+		.. "list[nodemeta:"..spos..";queen;3.5,1;1,1;]"
+		.. "tooltip[3.5,1;1,1;Queen]"
+		.. "list[nodemeta:"..spos..";frames;0,3;8,1;]"
+		.. "tooltip[0,3;8,1;Frames]"
+		.. "list[current_player;main;0,5;8,4;]"
+	return formspec
+end
+
+local function polinate_flower(pos, flower)
+	local spawn_pos = {
+		x = pos.x + math.random(-3, 3),
+		y = pos.y + math.random(-3, 3),
+		z = pos.z + math.random(-3, 3)
+	}
+	local floor_pos = {x = spawn_pos.x, y = spawn_pos.y - 1, z = spawn_pos.z}
+	local spawn = minetest.get_node(spawn_pos).name
+	local floorn = minetest.get_node(floor_pos).name
+
+	if floorn == "group:soil" and spawn == "air" then
+		minetest.set_node(spawn_pos, {name = flower})
+	end
+end
+
 local function stackOrNil(stack)
 	if stack and stack.get_count and stack:get_count() > 0 then
 		return stack
@@ -40,7 +66,6 @@ local function tube_add_to_hive(pos, input_stack)
 		if input_stack:get_count() > 0 and (not stack_i or stack_i:is_empty())
 			and input_stack:get_name() == "bees:frame_empty" then
 			local framestack = ItemStack("bees:frame_empty")
-			framestack:set_count(1)
 			inv:set_stack("frames", i, framestack)
 			input_stack:set_count(input_stack:get_count() - 1)
 			if not timer:is_started() and inv:contains_item("queen", "bees:queen") then
@@ -52,7 +77,6 @@ local function tube_add_to_hive(pos, input_stack)
 
 	if input_stack:get_name() == "bees:queen" and not inv:contains_item("queen", "bees:queen") then
 		local queenstack = ItemStack("bees:queen")
-		queenstack:set_count(1)
 		inv:set_stack("queen", 1, queenstack)
 		input_stack:set_count(input_stack:get_count() - 1)
 
@@ -93,13 +117,11 @@ local function tube_take_from_hive(pos, item_name, count)
 
 		if not itemstack or itemstack:is_empty() then
 			local queenstack = ItemStack("bees:queen")
-			queenstack:set_count(1)
 			itemstack = inv:remove_item("queen", queenstack)
 			stop_hive(pos)
 		end
 	else
-		local remstack = ItemStack(name)
-		remstack:set_count(count)
+		local remstack = ItemStack({name=name, count=count})
 
 		itemstack = inv:remove_item("frames", remstack)
 		if not itemstack or itemstack:is_empty() then
@@ -121,20 +143,16 @@ minetest.register_node("ta_apiary:bee_hive", {
 	sounds = default.node_sound_wood_defaults(),
 
 	on_construct = function(pos)
-
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
 
 		meta:set_int("agressive", 1)
-
 		inv:set_size("queen", 1)
 		inv:set_size("frames", 8)
-
 		meta:set_string("infotext", S("Requires Queen bee to function"))
 	end,
 
 	can_dig = function(pos)
-
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
 
@@ -146,7 +164,6 @@ minetest.register_node("ta_apiary:bee_hive", {
 	end,
 
 	on_rightclick = function(pos, _, clicker)
-
 		local player_name = clicker:get_player_name()
 
 		if minetest.is_protected(pos, player_name) then
@@ -155,7 +172,7 @@ minetest.register_node("ta_apiary:bee_hive", {
 
 		minetest.show_formspec(player_name,
 			"ta_apiary:bee_hive",
-			ta_apiary.hive_artificial(pos)
+			hive_artificial(pos)
 		)
 
 		local meta = minetest.get_meta(pos)
@@ -163,7 +180,6 @@ minetest.register_node("ta_apiary:bee_hive", {
 
 		if meta:get_int("agressive") == 1
 		and inv:contains_item("queen", "bees:queen") then
-
 			clicker:set_hp(clicker:get_hp() - 4)
 		else
 			meta:set_int("agressive", 1)
@@ -171,15 +187,12 @@ minetest.register_node("ta_apiary:bee_hive", {
 	end,
 
 	on_timer = function(pos)
-
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
 		local timer = minetest.get_node_timer(pos)
 
 		if inv:contains_item("queen", "bees:queen") then
-
 			if inv:contains_item("frames", "bees:frame_empty") then
-
 				timer:start(30)
 
 				local rad = 10
@@ -189,25 +202,18 @@ minetest.register_node("ta_apiary:bee_hive", {
 				local progress = meta:get_int("progress")
 
 				progress = progress + #flowers
-
 				meta:set_int("progress", progress)
 
 				if progress > 1000 then
-
 					local flower = flowers[math.random(#flowers)]
 
-					ta_apiary.polinate_flower(flower, minetest.get_node(flower).name)
+					polinate_flower(flower, minetest.get_node(flower).name)
 
 					local stacks = inv:get_list("frames")
-
 					for k, _ in pairs(stacks) do
-
 						if inv:get_stack("frames", k):get_name() == "bees:frame_empty" then
-
 							meta:set_int("progress", 0)
-
 							inv:set_stack("frames", k, "bees:frame_full")
-
 							return
 						end
 					end
@@ -217,7 +223,6 @@ minetest.register_node("ta_apiary:bee_hive", {
 				end
 			else
 				meta:set_string("infotext", S("Does not have empty frame(s)"))
-
 				timer:stop()
 			end
 		end
@@ -230,11 +235,8 @@ minetest.register_node("ta_apiary:bee_hive", {
 	end,
 
 	allow_metadata_inventory_move = function(pos, from_list, _, to_list, to_index)
-
 		local inv = minetest.get_meta(pos):get_inventory()
-
 		if from_list == to_list then
-
 			if inv:get_stack(to_list, to_index):is_empty() then
 				return 1
 			else
@@ -246,39 +248,31 @@ minetest.register_node("ta_apiary:bee_hive", {
 	end,
 
 	on_metadata_inventory_put = function(pos, listname, _, stack)
-
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
 		local timer = minetest.get_node_timer(pos)
 
 		if listname == "queen" or listname == "frames" then
-
 			meta:set_string("queen", stack:get_name())
 			meta:set_string("infotext", S("Queen inserted, now for the empty frames"))
 
 			if inv:contains_item("frames", "bees:frame_empty") then
-
 				timer:start(30)
-
 				meta:set_string("infotext", S("Bees are aclimating"))
 			end
 		end
 	end,
 
 	allow_metadata_inventory_put = function(pos, listname, index, stack)
-
 		if not minetest.get_meta(pos):get_inventory():get_stack(listname, index):is_empty() then
 			return 0
 		end
 
 		if listname == "queen" then
-
 			if stack:get_name():match("bees:queen*") then
 				return 1
 			end
-
 		elseif listname == "frames" then
-
 			if stack:get_name() == ("bees:frame_empty") then
 				return 1
 			end
@@ -297,7 +291,6 @@ techage.register_node({"ta_apiary:bee_hive"}, {
 	on_pull_item = function(pos, in_dir, num, item_name)
 		return tube_take_from_hive(pos, item_name, num)
 	end,
-
 
 	on_push_item = function(pos, in_dir, stack)
 		return tube_add_to_hive(pos, stack)
