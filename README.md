@@ -2,6 +2,9 @@
 
 **An Apiary and Honey Extractor for techage. The Honey Extractor has TA2, TA3 and TA4 versions**
 
+
+![screenshot](https://gitlab.com/lesya_minetest_mods/ta_apiary/-/raw/main/screenshots/new_blocks.png)
+
 The vision is to automate honey and wax production with TechAge industry.
 
 This mod adds:
