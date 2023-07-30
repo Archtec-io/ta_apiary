@@ -118,14 +118,19 @@ local function tube_take_from_hive(pos, item_name, count)
 		if not itemstack or itemstack:is_empty() then
 			local queenstack = ItemStack("bees:queen")
 			itemstack = inv:remove_item("queen", queenstack)
-			stop_hive(pos)
+			if itemstack and not itemstack:is_empty() then
+				stop_hive(pos)
+			end
 		end
 	else
-		local remstack = ItemStack({name=name, count=count})
+		local remstack = ItemStack({name=item_name, count=count})
 
 		itemstack = inv:remove_item("frames", remstack)
 		if not itemstack or itemstack:is_empty() then
 			itemstack = inv:remove_item("queen", remstack)
+			if itemstack and not itemstack:is_empty() then
+				stop_hive(pos)
+			end
 		end
 	end
 
