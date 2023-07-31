@@ -1,0 +1,9 @@
+# textdomain: ta_apiary
+Requires Queen bee to function=
+Bees are aclimating=
+Queen inserted, now the empty frames=
+progress:=
+Does not have empty frame(s)=
+Honey Extractor=
+Extracting=
+Honey Sink=

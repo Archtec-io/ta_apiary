@@ -122,13 +122,13 @@ local function sink_honey(pos, crd, nvm, inv)
 		return
 	end
 
-	local put_items = space_for_items(inv, "dst", "mobs:honey", get_items)
+	put_items = space_for_items(inv, "dst", "mobs:honey", get_items)
 	if put_items < 1 then
 		crd.State:blocked(pos, nvm)
 		return
 	end
 
-	put_stack = ItemStack({name = "mobs:honey", count = put_items})
+	local put_stack = ItemStack({name = "mobs:honey", count = put_items})
 	inv:remove_item("src", put_stack)
 	inv:add_item("dst", put_stack)
 	crd.State:keep_running(pos, nvm, COUNTDOWN_TICKS)
@@ -140,7 +140,7 @@ local function keep_running(pos, elapsed)
 	local inv = M(pos):get_inventory()
 	sink_honey(pos, crd, nvm, inv)
 end
-
+--[[
 local function on_receive_fields(pos, formname, fields, player)
 	if minetest.is_protected(pos, player:get_player_name()) then
 		return
@@ -156,7 +156,7 @@ local function can_dig(pos, player)
 	local inv = M(pos):get_inventory()
 	return inv:is_empty("dst") and inv:is_empty("src")
 end
-
+]]--
 
 local tiles = {}
 -- '#' will be replaced by the stage number

@@ -81,7 +81,7 @@ local function tube_add_to_hive(pos, input_stack)
 		input_stack:set_count(input_stack:get_count() - 1)
 
 		meta:set_string("queen", "bees:queen")
-		meta:set_string("infotext", S("Queen inserted, now for the empty frames"))
+		meta:set_string("infotext", S("Queen inserted, now the empty frames"))
 		if inv:contains_item("frames", "bees:frame_empty") then
 			timer:start(30)
 			meta:set_string("infotext", S("Bees are aclimating"))
@@ -259,7 +259,7 @@ minetest.register_node("ta_apiary:bee_hive", {
 
 		if listname == "queen" or listname == "frames" then
 			meta:set_string("queen", stack:get_name())
-			meta:set_string("infotext", S("Queen inserted, now for the empty frames"))
+			meta:set_string("infotext", S("Queen inserted, now the empty frames"))
 
 			if inv:contains_item("frames", "bees:frame_empty") then
 				timer:start(30)
