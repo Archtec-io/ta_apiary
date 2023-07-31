@@ -15,16 +15,8 @@ local M = minetest.get_meta
 
 ta_apiary = {}
 
-if minetest.get_translator then
-	ta_apiary.bees_S = minetest.get_translator("bees")
-	ta_apiary.S = minetest.get_translator("ta_apiary")
-elseif minetest.global_exists("intllib") then
-	ta_apiary.bees_S = intllib.Getter()
-	ta_apiary.S = intllib.Getter()
-else
-	ta_apiary.bees_S = function(s) return s end
-	ta_apiary.S = function(s) return s end
-end
+ta_apiary.bees_S = minetest.get_translator("bees")
+ta_apiary.S = minetest.get_translator("ta_apiary")
 
 ta_apiary.CRD = function(pos) return (minetest.registered_nodes[techage.get_node_lvm(pos).name] or {}).consumer or {} end
 
@@ -46,7 +38,7 @@ ta_apiary.allow_metadata_inventory_move =
 function(pos, from_list, from_index, to_list, to_index, count, player)
 	local inv = M(pos):get_inventory()
 	local stack = inv:get_stack(from_list, from_index)
-	return allow_metadata_inventory_put(pos, to_list, to_index, stack, player)
+	return ta_apiary.allow_metadata_inventory_put(pos, to_list, to_index, stack, player)
 end
 
 ta_apiary.allow_metadata_inventory_take =
