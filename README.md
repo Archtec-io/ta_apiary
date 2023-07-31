@@ -1,6 +1,6 @@
 # TA Apiary [ta\_apiary]
 
-**An Apiary and Honey Extractor for techage. The Honey Extractor has TA2, TA3 and TA4 versions**
+**TechAge Machines for beekeeping**
 
 
 ![screenshot](https://gitlab.com/lesya_minetest_mods/ta_apiary/-/raw/main/screenshots/new_blocks.png)
@@ -8,7 +8,7 @@
 The vision is to automate honey and wax production with TechAge industry.
 
 This mod adds:
- - Industrial Bee Hive is an apiary for bees from the [Bees](https://notabug.org/TenPlus1/bees) mod.
+ - TA Apiary is a beehive for bees from the [Bees](https://notabug.org/TenPlus1/bees) mod.
  This apiary can be automated with TA tubes and pushers. You'll probably want to use TA4 pushers to
  pull only full frames and not empty frames nor queen bees.
 
