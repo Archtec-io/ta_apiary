@@ -4,6 +4,7 @@ Bees are aclimating=
 Queen inserted, now the empty frames=
 progress:=
 Does not have empty frame(s)=
+TA Apiary=
 Honey Extractor=
 Extracting=
 Honey Sink=

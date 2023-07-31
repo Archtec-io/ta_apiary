@@ -12,7 +12,7 @@
 
 ]]--
 
-local S = ta_apiary.bees_S
+local S = ta_apiary.S
 
 local function hive_artificial(pos)
 	local spos = pos.x..","..pos.y..","..pos.z
@@ -138,7 +138,7 @@ local function tube_take_from_hive(pos, item_name, count)
 end
 
 minetest.register_node("ta_apiary:bee_hive", {
-	description = ("Industrial Bee Hive"),
+	description = S("TA Apiary"),
 	tiles = {"ta_apiary_bee_hive_side.png","ta_apiary_bee_hive_side.png","ta_apiary_bee_hive_side.png",
 		 "ta_apiary_bee_hive_side.png","ta_apiary_bee_hive_side.png","ta_apiary_bee_hive_front.png"},
 	paramtype2 = "facedir",

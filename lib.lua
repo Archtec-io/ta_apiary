@@ -15,7 +15,6 @@ local M = minetest.get_meta
 
 ta_apiary = {}
 
-ta_apiary.bees_S = minetest.get_translator("bees")
 ta_apiary.S = minetest.get_translator("ta_apiary")
 
 ta_apiary.CRD = function(pos) return (minetest.registered_nodes[techage.get_node_lvm(pos).name] or {}).consumer or {} end
