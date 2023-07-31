@@ -62,7 +62,7 @@ local function extracting(pos, crd, nvm, inv)
 
 	if inv:room_for_item("dst", honey_stack)
 		and inv:room_for_item("dst", wax_stack)
-		and inv:room_for_item("dst", frames_stack) then
+		and inv:room_for_item("dst", empty_frames_stack) then
 
 		local full_frames_stack = ItemStack({name = "bees:frame_full", count = item_count})
 		inv:remove_item("src", full_frames_stack)
