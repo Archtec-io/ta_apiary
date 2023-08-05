@@ -661,3 +661,29 @@ if any, to sign a "copyright disclaimer" for the program, if necessary.
 For more information on this, and how to apply and follow the GNU AGPL, see
 <https://www.gnu.org/licenses/>.
 
+
+Textures by Bas80, Neuromancer and Olesya Sibidanova are CC BY-SA
+
+BlockMen (CC BY-SA 3.0):
+  default_wood.png
+
+Bas80 and Neuromancer (CC BY-SA):
+  bees_hive_artificial.png
+  bees_extractor.png
+  bees_extractor_front.png
+  bees_hive_industrial.png
+
+The ta_apiary_bee_hive_front.png texture is based on bees_hive_artificial.png
+
+The ta_apiary_bee_hive_side.png texture is based on default_wood.png
+
+The ta_apiary_extractor.png texture is based on bees_extractor.png
+
+The following textures are based on bees_extractor_front.png
+  ta_apiary_extractor_front_active.png
+  ta_apiary_extractor_front_inactive.png
+
+The following textures are based on bees_hive_industrial.png
+  ta_apiary_extractor_top_active.png
+  ta_apiary_extractor_top_inactive.png
+
