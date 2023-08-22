@@ -15,6 +15,9 @@ local M = minetest.get_meta
 
 ta_apiary = {}
 
+ta_apiary.abm_enabled = minetest.settings:get_bool("ta_apiary_abm_enabled") ~= false
+
+
 ta_apiary.S = minetest.get_translator("ta_apiary")
 
 ta_apiary.CRD = function(pos) return (minetest.registered_nodes[techage.get_node_lvm(pos).name] or {}).consumer or {} end
